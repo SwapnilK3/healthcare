@@ -1,0 +1,664 @@
+{
+	"info": {
+		"_postman_id": "healthcare-api-collection",
+		"name": "Healthcare Backend API",
+		"description": "Complete API collection for Healthcare Backend - PostgreSQL + Django REST Framework + JWT Auth",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{ACCESS_TOKEN}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"ACCESS_TOKEN\", jsonData.tokens.access);",
+									"    pm.environment.set(\"REFRESH_TOKEN\", jsonData.tokens.refresh);",
+									"    console.log(\"Admin registered and tokens saved\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@healthcare.com\",\n    \"name\": \"Admin User\",\n    \"password\": \"Admin@123\",\n    \"password_confirm\": \"Admin@123\",\n    \"role\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/register/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"register",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"ACCESS_TOKEN\", jsonData.tokens.access);",
+									"    pm.environment.set(\"REFRESH_TOKEN\", jsonData.tokens.refresh);",
+									"    console.log(\"Tokens saved to environment\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@healthcare.com\",\n    \"password\": \"Admin@123\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/login/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"ACCESS_TOKEN\", jsonData.access);",
+									"    console.log(\"Access token refreshed\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"{{REFRESH_TOKEN}}\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/token/refresh/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"token",
+								"refresh",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Doctors",
+			"item": [
+				{
+					"name": "Create Doctor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"DOCTOR_ID\", jsonData.doctor.id);",
+									"    pm.environment.set(\"DOCTOR_USER_ID\", jsonData.doctor.user_id);",
+									"    console.log(\"Doctor created: \" + jsonData.doctor.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"dr.smith@hospital.com\",\n    \"name\": \"Dr. John Smith\",\n    \"password\": \"Doctor@123\",\n    \"phone\": \"+1234567890\",\n    \"date_of_birth\": \"1980-05-15\",\n    \"gender\": \"M\",\n    \"address\": \"123 Medical Center Dr\",\n    \"specialization\": \"Cardiology\",\n    \"license_number\": \"MED12345\",\n    \"experience_years\": 15,\n    \"is_available\": true\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/doctors/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"doctors",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Doctors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/doctors/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"doctors",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Doctor by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/doctors/{{DOCTOR_ID}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"doctors",
+								"{{DOCTOR_ID}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Doctor (PUT)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Dr. John Smith Updated\",\n    \"phone\": \"+1234567890\",\n    \"address\": \"456 New Medical Center\",\n    \"specialization\": \"Cardiology\",\n    \"license_number\": \"MED12345\",\n    \"experience_years\": 16,\n    \"is_available\": true\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/doctors/{{DOCTOR_ID}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"doctors",
+								"{{DOCTOR_ID}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Doctor (PATCH)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"experience_years\": 20,\n    \"is_available\": false\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/doctors/{{DOCTOR_ID}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"doctors",
+								"{{DOCTOR_ID}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Doctor",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/doctors/{{DOCTOR_ID}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"doctors",
+								"{{DOCTOR_ID}}",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Patients",
+			"item": [
+				{
+					"name": "Create Patient",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"PATIENT_ID\", jsonData.patient.id);",
+									"    pm.environment.set(\"PATIENT_USER_ID\", jsonData.patient.user_id);",
+									"    console.log(\"Patient created: \" + jsonData.patient.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"jane.doe@example.com\",\n    \"name\": \"Jane Doe\",\n    \"password\": \"Patient@123\",\n    \"phone\": \"+9876543210\",\n    \"date_of_birth\": \"1995-08-20\",\n    \"gender\": \"F\",\n    \"address\": \"789 Patient Street\",\n    \"blood_group\": \"O+\",\n    \"medical_history\": \"No major issues\",\n    \"emergency_contact\": \"+9876543211\",\n    \"allergies\": \"Penicillin\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/patients/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"patients",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Patients",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/patients/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"patients",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Patient by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/patients/{{PATIENT_ID}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"patients",
+								"{{PATIENT_ID}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Patient (PUT)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Jane Doe Updated\",\n    \"phone\": \"+9876543210\",\n    \"address\": \"789 New Patient Street\",\n    \"blood_group\": \"O+\",\n    \"medical_history\": \"Updated medical history\",\n    \"emergency_contact\": \"+9876543211\",\n    \"allergies\": \"Penicillin, Dust\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/patients/{{PATIENT_ID}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"patients",
+								"{{PATIENT_ID}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Patient (PATCH)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"blood_group\": \"AB+\",\n    \"allergies\": \"None\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/patients/{{PATIENT_ID}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"patients",
+								"{{PATIENT_ID}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Patient",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/patients/{{PATIENT_ID}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"patients",
+								"{{PATIENT_ID}}",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Mappings",
+			"item": [
+				{
+					"name": "Create Mapping",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"MAPPING_ID\", jsonData.mapping.id);",
+									"    console.log(\"Mapping created: \" + jsonData.mapping.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patient\": \"{{PATIENT_USER_ID}}\",\n    \"doctor\": \"{{DOCTOR_USER_ID}}\",\n    \"notes\": \"Primary care physician assignment\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/mappings/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"mappings",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Mappings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/mappings/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"mappings",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Mapping by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/mappings/{{MAPPING_ID}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"mappings",
+								"{{MAPPING_ID}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Patient's Doctors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/mappings/patient/{{PATIENT_USER_ID}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"mappings",
+								"patient",
+								"{{PATIENT_USER_ID}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Mapping (PATCH)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"notes\": \"Updated notes for this assignment\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/mappings/{{MAPPING_ID}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"mappings",
+								"{{MAPPING_ID}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Mapping",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/mappings/{{MAPPING_ID}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"mappings",
+								"{{MAPPING_ID}}",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "API Root",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "BASE_URL",
+			"value": "http://localhost:8000/api",
+			"type": "string"
+		}
+	]
+}
