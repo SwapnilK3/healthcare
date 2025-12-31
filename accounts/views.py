@@ -408,7 +408,7 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         """Return active assignments."""
         return self.queryset.filter(is_active=True).order_by('-created_at')
 
-    def list(self, request):
+    def list(self, request, *args, **kwargs):
         """GET /mappings/ - List all active mappings."""
         queryset = self.get_queryset()
         paginator = Pagination()
@@ -422,7 +422,7 @@ class AssignmentViewSet(viewsets.ModelViewSet):
             message='Mappings retrieved successfully'
         )
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         """POST /mappings/ - Create a new patient-doctor mapping."""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -505,14 +505,14 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         """GET /mappings/patient/{patient_id}/ - Get all doctors assigned to a specific patient."""
         patient = get_object_or_404(User, pk=patient_id, role=UserRole.PATIENT, is_active=True)
         assignments = self.get_queryset().filter(patient=patient)
-        paginator = Pagination()
-        paginated_assignments = paginator.paginate_queryset(assignments, request)
-        serializer = PatientDoctorsSerializer(paginated_assignments, many=True)
-        paginated_data = paginator.get_paginated_response(serializer.data).data
-        paginated_data['patient'] = patient.name
-        paginated_data['patient_id'] = str(patient.id)
+        # paginator = Pagination()
+        # paginated_assignments = paginator.paginate_queryset(assignments, request)
+        # serializer = PatientDoctorsSerializer(paginated_assignments, many=True)
+        # paginated_data = paginator.get_paginated_response(serializer.data).data
+        serializer = PatientDoctorsSerializer(assignments, many=True)
+        serializer_data = serializer.data
         return rest_api_formatter(
-            data=paginated_data,
+            data=serializer_data,
             status_code=status.HTTP_200_OK,
             success=True,
             message='Patient mappings retrieved successfully'
